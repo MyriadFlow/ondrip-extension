@@ -1,4 +1,4 @@
-# ondrip-extension
+# Ondrip Extension
 Chromium Extension for the OnDrip App
 
 
