@@ -9,7 +9,7 @@ export const getAccessControlConditions = (tokenId: number) => {
             chain,
             method: 'accessToCredentials',
             parameters: [
-                ":userAddress"
+                tokenId
             ],
             returnValueTest: {
                 comparator: '=',
