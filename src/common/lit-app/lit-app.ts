@@ -9,6 +9,14 @@ type SmartContractCreds = {
     excryptedKey: string, //hex
     excrypedtedData: string //hex
 }
+
+type AuthSig = {
+    sig: string,// hex
+    derivedVia: string,
+    signedMessage: string,
+    address: string
+}
+
 let litClient: any
 const chain = "mumbai"
 
@@ -18,13 +26,10 @@ const initLitClient = async () => {
     await litClient.current.connect();
 }
 
-const getCreds = async (tokenId: number, contractCredsHex: string): Promise<SubCreds> => {
+const getCreds = async (authSig: AuthSig, tokenId: number, contractCredsHex: string): Promise<SubCreds> => {
     const smartContractCredsJson = Buffer.from(contractCredsHex, "hex").toString()
     const smartContractCreds: SmartContractCreds = JSON.parse(smartContractCredsJson)
     await initLitClient()
-    const authSig = await LitJsSdk.checkAndSignAuthMessage({
-        chain,
-    });
 
     const client = litClient.current;
     const symmetricKey = await client.getEncryptionKey({
