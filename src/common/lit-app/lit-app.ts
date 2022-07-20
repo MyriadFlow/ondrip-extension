@@ -4,6 +4,11 @@ type SubCreds = {
     username: string,
     password: string
 }
+
+type SmartContractCreds = {
+    excryptedKey: string, //hex
+    excrypedtedData: string //hex
+}
 let litClient: any
 const chain = "mumbai"
 
@@ -13,7 +18,9 @@ const initLitClient = async () => {
     await litClient.current.connect();
 }
 
-const getCreds = async (tokenId: number, encryptedSymmetricKey: Uint8Array, encryptedString: Blob): Promise<SubCreds> => {
+const getCreds = async (tokenId: number, contractCredsHex: string): Promise<SubCreds> => {
+    const smartContractCredsJson = Buffer.from(contractCredsHex, "hex").toString()
+    const smartContractCreds: SmartContractCreds = JSON.parse(smartContractCredsJson)
     await initLitClient()
     const authSig = await LitJsSdk.checkAndSignAuthMessage({
         chain,
@@ -22,15 +29,24 @@ const getCreds = async (tokenId: number, encryptedSymmetricKey: Uint8Array, encr
     const client = litClient.current;
     const symmetricKey = await client.getEncryptionKey({
         accessControlConditions: getAccessControlConditions(tokenId),
-        toDecrypt: Buffer.from(encryptedSymmetricKey).toString("hex"),
+        toDecrypt: smartContractCreds.excryptedKey,
         chain,
         authSig,
     });
 
+    var typedArray = new Uint8Array(
+        (smartContractCreds.excrypedtedData as any).match(/[\da-f]{2}/gi).map(function (h: any) {
+            return parseInt(h, 16);
+        })
+    );
+    const encryptedDataBlob = new Blob([typedArray], {
+        type: "'application/octet-stream",
+    });
     const decryptedString = await LitJsSdk.decryptString(
-        encryptedString,
+        encryptedDataBlob,
         symmetricKey
     );
+    const jsonString = Buffer.from(decryptedString).toString()
 
-    return JSON.parse(decryptedString) as SubCreds
+    return JSON.parse(jsonString) as SubCreds
 }
