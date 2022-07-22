@@ -1,13 +1,14 @@
 import LitJsSdk from 'lit-js-sdk'
-import { getAccessControlConditions } from "./access-control"
+import { getEvmContractConditions } from "./access-control"
+import { Buffer } from "buffer"
 type SubCreds = {
     username: string,
     password: string
 }
 
 type SmartContractCreds = {
-    excryptedKey: string, //hex
-    excrypedtedData: string //hex
+    encryptedKey: string, //hex
+    encrypedtedData: string //hex
 }
 
 type AuthSig = {
@@ -23,24 +24,24 @@ const chain = "mumbai"
 const initLitClient = async () => {
     if (!litClient)
         litClient = new LitJsSdk.LitNodeClient();
-    await litClient.current.connect();
+    await litClient.connect();
 }
 
-const getCreds = async (authSig: AuthSig, tokenId: number, contractCredsHex: string): Promise<SubCreds> => {
-    const smartContractCredsJson = Buffer.from(contractCredsHex, "hex").toString()
-    const smartContractCreds: SmartContractCreds = JSON.parse(smartContractCredsJson)
+export const getCreds = async (authSig: AuthSig, tokenId: string, smartContractCredsJsonStr: string) => {
+    const smartContractCreds: SmartContractCreds = JSON.parse(smartContractCredsJsonStr)
     await initLitClient()
 
-    const client = litClient.current;
-    const symmetricKey = await client.getEncryptionKey({
-        accessControlConditions: getAccessControlConditions(tokenId),
-        toDecrypt: smartContractCreds.excryptedKey,
+    const params = {
+        evmContractConditions: getEvmContractConditions(tokenId),
+        toDecrypt: smartContractCreds.encryptedKey,
         chain,
         authSig,
-    });
+    }
+
+    const symmetricKey = await litClient.getEncryptionKey(params);
 
     var typedArray = new Uint8Array(
-        (smartContractCreds.excrypedtedData as any).match(/[\da-f]{2}/gi).map(function (h: any) {
+        (smartContractCreds.encrypedtedData as any).match(/[\da-f]{2}/gi).map(function (h: any) {
             return parseInt(h, 16);
         })
     );

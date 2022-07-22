@@ -1,36 +1,48 @@
-import { chain } from "./config"
+import { chain, nftContractAddress } from "../../env"
 
-
-export const getAccessControlConditions = (tokenId: number) => {
+export const getEvmContractConditions = (tokenId: string) => {
     return [
         {
-            contractAddress: '0x89b597199dAc806Ceecfc091e56044D34E59985c',
-            standardContractType: 'ERC721',
+            contractAddress: nftContractAddress,
+            functionName: "accessToCredentials",
+            functionParams: [tokenId],
+            functionAbi: {
+                inputs: [
+                    { internalType: "uint256", name: "_tokenID", type: "uint256" },
+                ],
+                name: "accessToCredentials",
+                outputs: [{ internalType: "bool", name: "access", type: "bool" }],
+                stateMutability: "view",
+                type: "function",
+            },
             chain,
-            method: 'accessToCredentials',
-            parameters: [
-                tokenId
-            ],
             returnValueTest: {
-                comparator: '=',
-                value: 'true'
+                key: "",
+                comparator: "=",
+                value: "true",
             },
         },
         {
-            "operator": "and"
+            operator: "and",
         },
         {
-            contractAddress: '0x89b597199dAc806Ceecfc091e56044D34E59985c',
-            standardContractType: 'ERC721',
+            contractAddress: nftContractAddress,
+            functionName: "ownerOf",
+            functionParams: [tokenId],
+            functionAbi: {
+                inputs: [{ internalType: "uint256", name: "tokenId", type: "uint256" }],
+                name: "ownerOf",
+                outputs: [{ internalType: "address", name: "", type: "address" }],
+                stateMutability: "view",
+                type: "function",
+            },
             chain,
-            method: 'ownerOf',
-            parameters: [
-                tokenId
-            ],
             returnValueTest: {
-                comparator: '=',
-                value: ':userAddress'
+                key: "",
+                comparator: "=",
+                value: ":userAddress",
             },
         },
     ]
+
 }

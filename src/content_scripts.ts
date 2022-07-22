@@ -1,9 +1,12 @@
+import { getCreds } from "./common/lit-app/lit-app";
+
 console.table("Starting OnDrip | MyriadFlow Browser Extension...");
 
 chrome.runtime.onMessage.addListener(
     function (message, sender, sendResponse) {
         switch (message.type) {
             case "injectCredentials": {
+
                 console.table("Got Request...");
                 console.table(message);
                 (document.querySelector("input[id=id_userLoginId]") as HTMLInputElement).value = message.username;
@@ -12,6 +15,9 @@ chrome.runtime.onMessage.addListener(
                 sendResponse("Injection Successful");
             }
                 break;
+            case "getCredentials": {
+                sendResponse(getCreds(message.authSign, message.tokenId, message.smartContractCreds))
+            }
         }
     }
 );
