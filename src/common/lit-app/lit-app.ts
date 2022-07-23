@@ -11,7 +11,7 @@ type SmartContractCreds = {
     encrypedtedData: string //hex
 }
 
-type AuthSig = {
+export type AuthSig = {
     sig: string,// hex
     derivedVia: string,
     signedMessage: string,
