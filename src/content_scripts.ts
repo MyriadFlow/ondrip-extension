@@ -17,8 +17,8 @@ chrome.runtime.onMessage.addListener(
 async function getAndInjectCreds(authSign: AuthSig, tokenId: string, smartContractCreds: string) {
     const creds = await getCreds(authSign, tokenId, smartContractCreds)
     console.table("Got Request...");
-    (document.querySelector("input[id=id_userLoginId]") as HTMLInputElement).value = creds.username;
-    (document.querySelector("input[id=id_password]") as HTMLInputElement).value = creds.password;
-    document.getElementsByTagName("form")[0].submit();;
+    (document.querySelector(`input#ap_email`) as HTMLInputElement).value = creds.username;
+    (document.querySelector("input#ap_password") as HTMLInputElement).value = creds.password;
+    (document.querySelector("input#signInSubmit") as HTMLInputElement).click();
     return "Inject success"
 }
